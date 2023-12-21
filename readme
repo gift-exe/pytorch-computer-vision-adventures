@@ -3,6 +3,7 @@ This repo basically contains notebooks on computer vision tasks with pytorch.
 
 - Binary Classification
 - Multiclass Classification
--
+- Single Object Detection
+- 
 
 More to come soon :)
