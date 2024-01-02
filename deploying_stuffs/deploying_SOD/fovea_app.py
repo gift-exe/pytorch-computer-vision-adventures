@@ -54,7 +54,7 @@ def main():
         pred_label = model_inference(model, t_image)
         pred_image = draw_boundary_box(t_image, pred_label)
         
-        st.image([t_image, pred_image], caption=['Uploaded Image', 'Fovea Location'], width=256)
+        st.image([F.to_pil_image(t_image), pred_image], caption=['Uploaded Image', 'Fovea Location'], width=256)
 
         
 
