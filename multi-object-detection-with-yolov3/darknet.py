@@ -2,11 +2,9 @@ from __future__ import division
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.autograd import Variable
-import numpy as np
 
 from .layers import EmptyLayer, DetectionLayer
+from .util import predict_transform, get_test_input
 
 def parse_cfg(cfgfile):
     '''
@@ -171,3 +169,25 @@ class DarkNet(nn.Module):
             elif module_type == 'shortcut':
                 from_ = int(module['from'])
                 x = outputs[i - 1] + outputs[i + from_]
+            
+            elif module_type == 'yolo':
+                anchors = self.module_list[1][0].anchors
+                inp_dim = int(self.net_info['height'])
+                num_classes = int(module['classes'])
+
+                x = x.data
+                x = predict_transform(x, inp_dim, anchors, num_classes, CUDA)
+                if not write:
+                    detections = x
+                    write = 1
+                else:
+                    detections = torch.cat((detections, x), 1)
+            
+            outputs[i] = x
+        
+        return detections
+
+model = DarkNet('./yolo-v3-cfg/yolov3.cfg')
+inp = get_test_input()
+pred = model(inp, torch.cuda.is_available())
+print(pred)
