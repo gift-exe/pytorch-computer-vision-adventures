@@ -4,8 +4,8 @@ import torch
 import torch.nn as nn
 
 
-from multi_object_detection_with_yolov3.layers import EmptyLayer, DetectionLayer
-from multi_object_detection_with_yolov3.util import predict_transform, get_test_input
+from layers import EmptyLayer, DetectionLayer
+from util import predict_transform, get_test_input
 
 def parse_cfg(cfgfile):
     '''
@@ -128,10 +128,6 @@ def create_modules(blocks):
     return (net_info, module_list)
 
 
-blocks = parse_cfg('yolo-v3-cfg/yolov3.cfg')
-print(create_modules(blocks))
-
-
 class DarkNet(nn.Module):
     def __init__(self, cfgfile):
         super(DarkNet, self).__init__()
@@ -172,7 +168,7 @@ class DarkNet(nn.Module):
                 x = outputs[i - 1] + outputs[i + from_]
             
             elif module_type == 'yolo':
-                anchors = self.module_list[1][0].anchors
+                anchors = self.module_list[i][0].anchors
                 inp_dim = int(self.net_info['height'])
                 num_classes = int(module['classes'])
 
