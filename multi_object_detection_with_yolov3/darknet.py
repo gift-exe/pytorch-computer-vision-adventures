@@ -3,8 +3,9 @@ from __future__ import division
 import torch
 import torch.nn as nn
 
-from .layers import EmptyLayer, DetectionLayer
-from .util import predict_transform, get_test_input
+
+from multi_object_detection_with_yolov3.layers import EmptyLayer, DetectionLayer
+from multi_object_detection_with_yolov3.util import predict_transform, get_test_input
 
 def parse_cfg(cfgfile):
     '''
