@@ -23,7 +23,7 @@ def predict_transform(prediction, inp_dim, anchors, num_classes, CUDA=True):
     prediction[:, :, 4] = torch.sigmoid(prediction[:, :, 4])
 
     grid = np.arange(grid_size)
-    a, b = np.meshgrid(grid, grid)
+    a, b = np.meshgrid(grid, grid)      
 
     x_offset = torch.FloatTensor(a).view(-1, 1)
     y_offset = torch.FloatTensor(b).view(-1, 1)
@@ -44,7 +44,7 @@ def predict_transform(prediction, inp_dim, anchors, num_classes, CUDA=True):
     anchors = anchors.repeat(grid_size*grid_size, 1).unsqueeze(0)
     prediction[:, :, 2:4] = torch.exp(prediction[:, :, 2:4]) * anchors
 
-    prediction[:, :, 5: 5+num_classes] = torch.sigmoid((prediction[:, :, 5: 5+num_classes]))
+    prediction[:, :, 5:5+num_classes] = torch.sigmoid((prediction[:, :, 5:5+num_classes]))
     
     prediction[:, :, :4] *= stride
 
