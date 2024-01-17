@@ -8,14 +8,16 @@ import cv2
 def predict_transform(prediction, inp_dim, anchors, num_classes, CUDA=True):
     batch_size = prediction.size(0)
     stride = inp_dim // prediction.size(2)
-    grid_size = inp_dim // stride
+    grid_size = prediction.size(2) #inp_dim // stride
     bbox_attrs = 5 + num_classes
     num_anchors = len(anchors)
 
     prediction = prediction.view(batch_size, bbox_attrs*num_anchors, grid_size*grid_size)
+    print(prediction.shape)
     prediction = prediction.transpose(1, 2).contiguous()
+    print(prediction.shape)
     prediction = prediction.view(batch_size, grid_size*grid_size*num_anchors, bbox_attrs)
-
+    print(prediction.shape)
     anchors = [(anchor[0]/stride, anchor[1]/stride) for anchor in anchors]
 
     prediction[:, :, 0] = torch.sigmoid(prediction[:, :, 0])
@@ -47,6 +49,8 @@ def predict_transform(prediction, inp_dim, anchors, num_classes, CUDA=True):
     prediction[:, :, 5:5+num_classes] = torch.sigmoid((prediction[:, :, 5:5+num_classes]))
     
     prediction[:, :, :4] *= stride
+    
+    print('\n')
 
     return prediction
 

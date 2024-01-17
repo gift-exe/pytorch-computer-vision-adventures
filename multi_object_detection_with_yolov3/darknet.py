@@ -79,7 +79,7 @@ def create_modules(blocks):
         
         elif (x['type'] == 'upsample'):
             stride = int(x['stride'])
-            upsample = nn.Upsample(scale_factor=stride, mode='bilinear')
+            upsample = nn.Upsample(scale_factor=2, mode='bilinear')
             module.add_module('upsample_{}'.format(index), upsample)
         
         elif (x['type'] == 'route'):
@@ -88,7 +88,7 @@ def create_modules(blocks):
             start = int(x['layers'][0])
 
             try:
-                end = int(x['layers'][-1])
+                end = int(x['layers'][1])
             except:
                 end = 0
             
@@ -140,11 +140,11 @@ class DarkNet(nn.Module):
 
         write = 0
         for i, module in enumerate(modules):
-            print(self.module_list[i], '------------------------------------------\n')
             module_type = (module['type'])
             
             if module_type == 'convolutional' or module_type == 'upsample':
                 x = self.module_list[i](x)
+
 
             elif module_type == 'route':
                 layers = module['layers']
@@ -180,12 +180,19 @@ class DarkNet(nn.Module):
                     write = 1
                 else:
                     detections = torch.cat((detections, x), 1)
-            
+        
             outputs[i] = x
         
         return detections
 
-model = DarkNet('./yolo-v3-cfg/yolov3.cfg')
-inp = get_test_input()
-pred = model(inp, torch.cuda.is_available())
-print(pred)
+if __name__ == '__main__':
+    
+    # b = parse_cfg('./yolo-v3-cfg/yolov3.cfg')
+    # m = create_modules(b)
+    # print(m[1])
+
+
+    model = DarkNet('./yolo-v3-cfg/yolov3.cfg')
+    inp = get_test_input()
+    pred = model(inp, torch.cuda.is_available())
+    print(pred)
