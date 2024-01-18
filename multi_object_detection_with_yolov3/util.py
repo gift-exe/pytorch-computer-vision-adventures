@@ -13,11 +13,8 @@ def predict_transform(prediction, inp_dim, anchors, num_classes, CUDA=True):
     num_anchors = len(anchors)
 
     prediction = prediction.view(batch_size, bbox_attrs*num_anchors, grid_size*grid_size)
-    print(prediction.shape)
     prediction = prediction.transpose(1, 2).contiguous()
-    print(prediction.shape)
     prediction = prediction.view(batch_size, grid_size*grid_size*num_anchors, bbox_attrs)
-    print(prediction.shape)
     anchors = [(anchor[0]/stride, anchor[1]/stride) for anchor in anchors]
 
     prediction[:, :, 0] = torch.sigmoid(prediction[:, :, 0])
