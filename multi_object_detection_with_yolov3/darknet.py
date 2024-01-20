@@ -141,6 +141,7 @@ class DarkNet(nn.Module):
         outputs = {} # cache outputs for route layer :)
 
         write = 0
+        yolo_layer_detections = []
         for i, module in enumerate(modules):
             module_type = (module['type'])
             
@@ -179,13 +180,15 @@ class DarkNet(nn.Module):
                 x = predict_transform(x, inp_dim, anchors, num_classes, CUDA)
                 if not write:
                     detections = x
+                    yolo_layer_detections.append(x)
                     write = 1
                 else:
                     detections = torch.cat((detections, x), 1)
+                    yolo_layer_detections.append(x)
         
             outputs[i] = x
         
-        return detections
+        return detections, yolo_layer_detections
     
     def load_weights(self, weightfile):
         fp = open(weightfile, 'rb')
@@ -281,5 +284,7 @@ if __name__ == '__main__':
     model = DarkNet('./yolov3.cfg')
     model.load_weights('./yolov3.weights')
     inp = get_test_input()
-    pred = model(inp, torch.cuda.is_available())
-    print(pred)
+    pred, yolo_pred = model(inp, torch.cuda.is_available())
+    print(pred.shape)
+    for i in yolo_pred:
+        print(i.shape)

@@ -47,8 +47,6 @@ def predict_transform(prediction, inp_dim, anchors, num_classes, CUDA=True):
     
     prediction[:, :, :4] *= stride
     
-    print('\n')
-
     return prediction
 
 def get_test_input():
