@@ -52,7 +52,7 @@ def predict_transform(prediction, inp_dim, anchors, num_classes, CUDA=True):
 def get_test_input():
     img = cv2.imread('dog-cycle-car.png')
     img = cv2.resize(img, (416, 416))
-    img_ = img[:, :, ::-1].transpose((2, 0, 1))  # BRG -> RBG | H X W C -> C X H X W
+    img_ = img[:, :, ::-1].transpose((2, 0, 1))  # BRG -> RBG | H x W x C -> C x H x W
     img_ = img_[np.newaxis, :, :, :]/255.0       # Add channel at 0 for batch | Normalize
     img_ = torch.from_numpy(img_).float()
     img_ = Variable(img_)
