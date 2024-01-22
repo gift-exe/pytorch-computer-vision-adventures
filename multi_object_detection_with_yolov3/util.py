@@ -49,7 +49,7 @@ def predict_transform(prediction, inp_dim, anchors, num_classes, CUDA=True):
     
     return prediction
 
-def write_util(prediction, confidence, num_classes, nms_conf=0.4):
+def write_results(prediction, confidence, num_classes, nms_conf=0.4):
     conf_mask = (prediction[:, :, 4] > confidence).float().unsqueeze(2)
     prediction = prediction * conf_mask
 
@@ -79,7 +79,7 @@ def write_util(prediction, confidence, num_classes, nms_conf=0.4):
         except:
             continue
 
-        if image_pred_.shape() == 0:
+        if image_pred_.shape[0] == 0:
             continue
 
         img_classes = unique(image_pred_[:, -1])
