@@ -268,23 +268,3 @@ class DarkNet(nn.Module):
 
                 conv_weights = conv_weights.view_as(conv.weight.data)
                 conv.weight.data.copy_(conv_weights)
-
-
-
-
-
-
-if __name__ == '__main__':
-    
-    # b = parse_cfg('./yolov3.cfg')
-    # m = create_modules(b)
-    # print(m[1])
-
-
-    model = DarkNet('./yolov3.cfg')
-    model.load_weights('./yolov3.weights')
-    inp = get_test_input()
-    pred, yolo_pred = model(inp, torch.cuda.is_available())
-    print(pred.shape)
-    for i in yolo_pred:
-        print(i.shape)

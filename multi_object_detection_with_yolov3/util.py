@@ -49,15 +49,6 @@ def predict_transform(prediction, inp_dim, anchors, num_classes, CUDA=True):
     
     return prediction
 
-def get_test_input():
-    img = cv2.imread('dog-cycle-car.png')
-    img = cv2.resize(img, (416, 416))
-    img_ = img[:, :, ::-1].transpose((2, 0, 1))  # BRG -> RBG | H x W x C -> C x H x W
-    img_ = img_[np.newaxis, :, :, :]/255.0       # Add channel at 0 for batch | Normalize
-    img_ = torch.from_numpy(img_).float()
-    img_ = Variable(img_)
-    return img_
-
 def write_util(prediction, confidence, num_classes, nms_conf=0.4):
     conf_mask = (prediction[:, :, 4] > confidence).float().unsqueeze(2)
     prediction = prediction * conf_mask
@@ -152,8 +143,6 @@ def bbox_iou(box1, box2):
     return iou
 
 
-
-
 def unique(tensor):
     tensor_np = tensor.cpu().numpy()
     unique_np = np.unique(tensor_np)
@@ -164,3 +153,39 @@ def unique(tensor):
 
     return tensor_res
 
+
+def get_test_input():
+    img = cv2.imread('dog-cycle-car.png')
+    img = cv2.resize(img, (416, 416))
+    img_ = img[:, :, ::-1].transpose((2, 0, 1))  # BRG -> RBG | H x W x C -> C x H x W
+    img_ = img_[np.newaxis, :, :, :]/255.0       # Add channel at 0 for batch | Normalize
+    img_ = torch.from_numpy(img_).float()
+    img_ = Variable(img_)
+    return img_
+
+def letterbox_image(img, inp_dim):
+    '''
+        resize image with unchanges aspect ratio using padding
+    '''
+
+    img_w, img_h = img.shape[1], img.shape[0]
+    w, h = inp_dim
+    new_w = int(img_w * min(w/img_w, h/img_h))
+    new_h = int(img_h * min(w/img_w, h/img_h))
+    resized_img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
+
+    canvas = np.full((inp_dim[1], inp_dim[0], 3), 128)
+    canvas[(h-new_h)//2 : (h-new_h)//2 + new_h, (w-new_w)//2 : (w-new_w)//2 + new_w, :] = resized_img
+
+    return canvas
+
+def prep_image(img, inp_dim):
+    '''
+        prep image for inputing to the network
+        returns a Variable
+    '''
+
+    img = cv2.resize(img, (inp_dim, inp_dim))
+    img = img[:, :, ::-1].transpose((2, 0, 1)).copy()  # BRG -> RBG | H x W x C -> C x H x W
+    img = torch.from_numpy(img).float().div(255.0).unsqueeze(0)
+    return img
