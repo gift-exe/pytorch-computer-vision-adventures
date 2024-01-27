@@ -39,7 +39,7 @@ def load_classes(namefile):
 
 
 args = arg_parse()
-images = args.images
+images = 'images/dog-cycle-car.png' #args.images
 batch_size = int(args.bs)
 confidence = float(args.confidence)
 nms_thresh = float(args.nms_thresh)
@@ -52,6 +52,7 @@ classes = load_classes('data/coco.names')
 print('loading network .....')
 model = DarkNet('./yolo-cfg/yolov3.cfg')
 model.load_weights('./yolo-cfg/yolov3.weights')
+model.eval()
 print('network successfully loaded')
 
 model.net_info['height'] = args.reso
@@ -70,7 +71,7 @@ try:
     imlist = [osp.join(osp.realpath('.'), images, img) for img in os.listdir(images)]
 except NotADirectoryError:
     imlist = []
-    imlist.append(osp.join(osp.realpath('.', images)))
+    imlist.append(osp.join(osp.realpath(images)))
 except FileNotFoundError:
     print('No file or directory with the name {}'.format(images))
     exit()
@@ -109,7 +110,8 @@ for i, batch in enumerate(im_batches):
     if CUDA:
         batch = batch.cuda()
     
-    prediction = model(Variable(batch, volatile=True), CUDA)
+    with torch.no_grad():
+        prediction = model(Variable(batch), CUDA)
     prediction = write_results(prediction[0], confidence, num_classes, nms_conf=nms_thresh)
     
     end = time.time()
@@ -164,12 +166,13 @@ colors = pkl.load(open("pallete", "rb"))
 draw = time.time()
 
 def write(x, results, color):
-    c1 = tuple(x[1:3].int())
-    c2 = tuple(x[3:5].int())
+    x = x.int().tolist()
+    c1 = tuple(x[1:3]) 
+    c2 = tuple(x[3:5])
     img = results[int(x[0])]
     cls = int(x[-1])
     label = "{0}".format(classes[cls])
-    cv2.rectangle(img, c1, c2,color, 1)
+    cv2.rectangle(img, c1, c2, color, 1)
     t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
     c2 = c1[0] + t_size[0] + 3, c1[1] + t_size[1] + 4
     cv2.rectangle(img, c1, c2,color, -1)
