@@ -112,11 +112,12 @@ for i, batch in enumerate(im_batches):
     
     with torch.no_grad():
         prediction = model(Variable(batch), CUDA)
-    prediction = write_results(prediction[0], confidence, num_classes, nms_conf=nms_thresh)
+        prediction = prediction[0]
+    prediction = write_results(prediction, confidence, num_classes, nms_conf=nms_thresh)
     
     end = time.time()
 
-    if type(prediction) == int:
+    if type(prediction[0]) == int:
         for im_num, image in enumerate(imlist[i*batch_size : min((1+1)*batch_size, len(imlist))]):
             im_id = i*batch_size + im_num
             print('{0:20s} predicted in {1:6.3f} seconds'.format(image.split('/')[-1], (end-start)/batch_size))
